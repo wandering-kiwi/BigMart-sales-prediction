@@ -14,7 +14,7 @@ def d_temp(x):
     return x - x + 3
 
 class Network():
-    def __init__(self, dimensions, activation=sigmoid, d_activation=d_sigmoid, learning_rate=0.00001):
+    def __init__(self, dimensions, activation=sigmoid, d_activation=d_sigmoid, learning_rate=0.0000007):
         self.dimensions = dimensions
         self.connections = range(len(dimensions)-1)
         self.activation=activation
@@ -24,7 +24,6 @@ class Network():
         self.learning_rate = learning_rate
     def init_weights(self):
         return [2 * np.random.random((self.dimensions[i-1], self.dimensions[i])) - 1 for i in range(len(self.dimensions))][1::]
-        # return [2 * np.zeros((self.dimensions[i-1], self.dimensions[i])) + 2.0 for i in range(len(self.dimensions))][1::]
     def cost(self, train_in, train_out):
         results = np.apply_along_axis(self.run, 1, train_in)
         results -= train_out
@@ -63,39 +62,27 @@ class Network():
                     actv_grad_vecs.append(d_a)
                 else:
                     d_z = self.d_activation(Z[i]) * actv_grad_vecs[0]
-                    # d_w = np.dot(d_z, np.repeat(A[i].reshape(1, A[i].size), d_z.size, axis=0))
-                    # d_w = d_z * np.repeat(A[i].reshape(1, A[i].size), d_z.size, axis=0)
                     d_w = np.outer(A[i], d_z)
                     d_b = d_z
                     d_a = np.dot(self.weights[i], d_z)
                     actv_grad_vecs.insert(0, d_a)
                     weight_grad_mats[j].insert(0, d_w)
                     bias_grad_mats[j].insert(0, d_b)
-            # for i in weight_grad_mats[j]:
-            #     print(i)
-        # print(weight_grad_mats)
-        # print([np.mean(np.array([i[j] for i in weight_grad_mats]), axis=0) for j in self.connections], 'mean')
-        # weight_grad_mats = np.array(weight_grad_mats)
-        # bias_grad_mats = np.array(bias_grad_mats) 
         weight_grad_vecs =[np.mean(np.array([i[j] for i in weight_grad_mats]), axis=0) for j in self.connections]
         bias_grad_vecs = [np.mean(np.array([i[j] for i in bias_grad_mats]), axis=0) for j in self.connections]
-        # for i in self.connections:
-            
-        #     # axis 0 means collapsing to a horizontal vector, axis 1 means to a vertical one.
-        #     weight_grad_vecs.append(weight_grad_mats.sum(axis=0))
-        #     print(weight_grad_mats.sum(axis=0), 'sum')
-        #     bias_grad_vecs.append(bias_grad_mats.sum(axis=0)/ len(train_in))
         return weight_grad_vecs, bias_grad_vecs
     def train(self, train_in, train_out, iters):
         for j in range(iters):
             # make code about batches later
             weight_grad_vecs, bias_grad_vecs = self.back_prop(train_in, train_out)
             for i in self.connections:
-                # print(self.weights[i]) 
                 self.weights[i] -= weight_grad_vecs[i] * self.learning_rate
                 self.biases[i] -= bias_grad_vecs[i] * self.learning_rate
         return self.cost(train_in, train_out)
 # just for testing
+
+
+# simple network
 
 # Y = Network(np.array([1, 1, 1, 1]), activation=temp, d_activation=d_temp)
 # # Y = Network(np.array([1, 1, 1, 1]), activation=ReLU, d_activation=d_ReLU)
@@ -118,28 +105,25 @@ class Network():
 
 
 
+# more complex netork
 
-
-X = Network(np.array([3, 4, 5, 2]), activation=temp, d_activation=d_temp)
+X = Network(np.array([2, 7, 8, 1]), activation=temp, d_activation=d_temp)
 train_in = np.array([
-    [1, 2, 3],
-    [1, 2, 3],
-    [1, 2, 3],
-    [1, 2, 3]
+    [1, 2],
+    [7, 12],
+    [3, -5],
+    [14, 6]
     ])
 train_out = np.array([
-    [1, 2],
-    [1, 2],
-    [1, 2],
-    [1, 2]
+    [3],
+    [19],
+    [-2],
+    [20]
     ])
-# print(X.cost(train_in, train_out))
-# 
-# for i in X.connections:
-#     print(Z[i], A[i])
-# print(X.weights[0])
-# Z, A = X.run(train_in[0], all_layers=True)
 
 print(X.cost(train_in, train_out), 'cost')
-print(X.train(train_in, train_out, 100))
-print(X.run([1, 2, 3]))
+new_cost = X.train(train_in, train_out, 8000)
+print(new_cost, 'improved cost')
+print('2 + 2 =', round(X.run([2, 2])[0]))
+
+# after 100 lines of code, finally I can add 2 + 2
