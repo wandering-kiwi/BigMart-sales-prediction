@@ -72,6 +72,8 @@ class Network():
                 self.biases[i] += bias_grad_vecs[i] * self.learning_rate
         return self.cost(train_in, train_out)
 # just for testing
+
+
 X = Network(np.array([3, 4, 5, 2]))
 train_in = np.array([
     [1, 2, 3],
