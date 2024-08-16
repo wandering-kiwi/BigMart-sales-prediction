@@ -14,7 +14,7 @@ def d_temp(x):
     return x - x + 3
 
 class Network():
-    def __init__(self, dimensions, activation=sigmoid, d_activation=d_sigmoid, learning_rate=0.0000007):
+    def __init__(self, dimensions, activation=sigmoid, d_activation=d_sigmoid, learning_rate=0.0001):
         self.dimensions = dimensions
         self.connections = range(len(dimensions)-1)
         self.activation=activation
@@ -107,23 +107,25 @@ class Network():
 
 # more complex netork
 
-X = Network(np.array([2, 7, 8, 1]), activation=temp, d_activation=d_temp)
-train_in = np.array([
-    [1, 2],
-    [7, 12],
-    [3, -5],
-    [14, 6]
-    ])
-train_out = np.array([
-    [3],
-    [19],
-    [-2],
-    [20]
-    ])
+learning_rate = 0.000003
+iters = 2000
+data_count = 70
 
+X = Network(np.array([2, 7, 8, 1]), activation=temp, d_activation=d_temp, learning_rate = learning_rate)
+train_in = []
+train_out = []
+
+for i in range(data_count):
+    a = np.random.random()*10
+    b = np.random.random()*10
+    c = a + b
+    train_in.append([a, b])
+    train_out.append([c])
+train_in = np.array(train_in)
+train_out = np.array(train_out)
 print(X.cost(train_in, train_out), 'cost')
-new_cost = X.train(train_in, train_out, 8000)
+new_cost = X.train(train_in, train_out, iters)
 print(new_cost, 'improved cost')
-print('2 + 2 =', round(X.run([2, 2])[0]))
+print('2 + 2 =', X.run([2, 2])[0])
 
 # after 100 lines of code, finally I can add 2 + 2
